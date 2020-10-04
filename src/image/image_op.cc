@@ -14,6 +14,7 @@ std::unique_ptr<Image> loadImage(const char *filename) {
         throw std::runtime_error(lodepng_error_text(error));
     }
 
+    auto image = std::make_unique<Image>(width, height);
     for (auto y = 0; y < height; y++) {
         for (auto x = 0; x < width; x++) {
             const auto index = 4 * (y * width + x);
@@ -21,14 +22,10 @@ std::unique_ptr<Image> loadImage(const char *filename) {
             const auto g = buffer[index + 1];
             const auto b = buffer[index + 2];
 
-            std::cout << "position: {" 
-            << x << "," << y << "}" 
-            << " color: {" <<
-            r << "," << g << "," << b
-            << "\n";
+            image->setPixel({x,y}, {r,g,b});
         }
     }
-    return nullptr;
+    return image;
 }
 
 }
