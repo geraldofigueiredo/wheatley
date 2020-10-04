@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <vector>
+#include <iostream>
 
 #include "point.h" // Point
 #include "color.h" // Color
@@ -10,15 +11,18 @@ class Image {
 public:
     typedef Point Position;
     typedef std::pair<unsigned int, unsigned int> Dimension;
+    enum class Occupancy { OCCUPIED, EMPTY };
 
     Image(const unsigned int width, const unsigned int height)
             : width{width}, height{height} {
         pixels.resize(width * height);
+        occupancyGrid.resize(width * height);
     }
 
     Image(const unsigned int width, const unsigned int height, std::vector<Color>&& pixels)
             : width{width}, height{height}, pixels{std::move(pixels)} {
         pixels.resize(width * height);
+        occupancyGrid.resize(width * height);
     }
 
     bool verifyBounds(const Position& position) const {
@@ -35,18 +39,60 @@ public:
         pixels[position.y * width + position.x] = color;
     }
 
+    void occupacyGrid() { createOccupancyGrid(); };
+
+    void setStartLocation(const Position& start) {
+        this->setPixel({start.x, start.y}, Color::RED());
+    }
+
+    void setEndLocation(const Position& end) {
+        this->setPixel({end.x, end.y}, Color::GREEN());
+    }
+
+    void printOccupancyGrid() {
+        for (size_t y = 0; y < height; y++) {
+            for (size_t x = 0; x < width; x++) {
+                std::cout << (occupancyGrid[y * width + x] == Occupancy::EMPTY);
+            }
+            std::cout << std::endl;
+        }
+        
+    }
+
     Dimension getDimension() const { return std::make_pair(width, height); }
     unsigned int getWidth() const { return width; }
     unsigned int getHeight() const { return height; }
 
 private:
     std::vector<Color> pixels;
+    std::vector<Occupancy> occupancyGrid;
     const unsigned int width;
     const unsigned int height;
 
     void assertInBound(const Position& position) const {
         if (!verifyBounds(position)) {
             throw std::exception();
+        }
+    }
+
+    void occupy(const Position& position) {
+        occupancyGrid[position.y * width + position.x] = Occupancy::OCCUPIED;
+    };
+
+    void empty(const Position& position) {
+        occupancyGrid[position.y * width + position.x] = Occupancy::EMPTY;
+    }
+
+    void createOccupancyGrid() {
+        for (size_t y = 0; y < height; y++) {
+            for (size_t x = 0; x < width; x++) {
+                const auto color = getPixel({x, y});
+                if (color == Color::BLACK() || color == Color::GRAY()) {
+                    this->occupy({x, y});
+                } else if (color == Color::WHITE()) {
+                    this->empty({x, y});
+                }
+            }
         }
     }
 };
