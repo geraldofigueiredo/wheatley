@@ -43,10 +43,12 @@ public:
 
     void setStartLocation(const Position& start) {
         this->setPixel({start.x, start.y}, Color::RED());
+        this->occupy(start);
     }
 
     void setEndLocation(const Position& end) {
         this->setPixel({end.x, end.y}, Color::GREEN());
+        this->occupy(end);
     }
 
     void printOccupancyGrid() {
