@@ -41,6 +41,9 @@ public:
 
     void occupacyGrid() { createOccupancyGrid(); };
 
+    bool isOccupied(const Position& position) { return occupancyGrid[position.y * width + position.x] == Occupancy::OCCUPIED; }
+    bool isEmpty(const Position& position) { return occupancyGrid[position.y * width + position.x] == Occupancy::EMPTY; }
+
     void setStartLocation(const Position& start) {
         this->setPixel({start.x, start.y}, Color::RED());
         this->occupy(start);

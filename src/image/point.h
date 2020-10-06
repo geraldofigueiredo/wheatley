@@ -15,4 +15,8 @@ public:
         x = other.x;
         y = other.y;
     }
+
+    void print() {
+        std::cout << "{" << x << "," << y << "} " << std::endl;
+    }
 };
