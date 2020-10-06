@@ -15,6 +15,7 @@ add_executable(wheatley src/main.cc)
 target_sources(wheatley
     PRIVATE 
         ${CMAKE_CURRENT_LIST_DIR}/src/image/image_op.cc
+        ${CMAKE_CURRENT_LIST_DIR}/src/image/image.cc
         ${CMAKE_CURRENT_LIST_DIR}/src/route_planner/PRM.cc
 )
 target_link_libraries(wheatley lodepng)

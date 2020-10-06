@@ -22,4 +22,5 @@ public:
     static constexpr Color RED() { return {255, 0, 0}; }
     static constexpr Color GREEN() { return {0, 255, 0}; }
     static constexpr Color BLUE() { return {0, 0, 255}; }
+    static constexpr Color LIGHTRED() { return {200, 30, 30}; }
 };

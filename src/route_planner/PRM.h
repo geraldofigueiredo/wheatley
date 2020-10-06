@@ -10,8 +10,7 @@ class PRM {
 public:
     PRM() = default;
     
-
-    void generateRoute(Image &image, const unsigned int numNodes);
+    void generateRoute(Image &image, const unsigned int numNodes, const Image::Position& start, const Image::Position& end);
     void printDistanceMatrix() {
         for (size_t i = 0; i < distanceMatrix.size(); i++) {
             for (size_t j = 0; j < distanceMatrix.size(); j++) {

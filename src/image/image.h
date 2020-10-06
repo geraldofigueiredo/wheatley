@@ -3,6 +3,7 @@
 #include <utility>
 #include <vector>
 #include <iostream>
+#include <cmath>
 
 #include "point.h" // Point
 #include "color.h" // Color
@@ -43,6 +44,8 @@ public:
 
     bool isOccupied(const Position& position) { return occupancyGrid[position.y * width + position.x] == Occupancy::OCCUPIED; }
     bool isEmpty(const Position& position) { return occupancyGrid[position.y * width + position.x] == Occupancy::EMPTY; }
+
+    float straightLine(const Position& p1, const Position& p2);
 
     void setStartLocation(const Position& start) {
         this->setPixel({start.x, start.y}, Color::RED());
@@ -89,8 +92,8 @@ private:
     }
 
     void createOccupancyGrid() {
-        for (size_t y = 0; y < height; y++) {
-            for (size_t x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
                 const auto color = getPixel({x, y});
                 if (color == Color::BLACK() || color == Color::GRAY()) {
                     this->occupy({x, y});
@@ -100,4 +103,6 @@ private:
             }
         }
     }
+
+    void drawLine(std::vector<Position> &points);
 };
