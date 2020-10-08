@@ -2,10 +2,14 @@
 
 #include <memory>
 #include <vector>
+#include <limits.h> 
+#include <stdio.h> 
 
 #include "../image/image.h"
 #include "../image/color.h"
 #include "../image/image_op.h"
+
+std::vector<int> dijkstra(const std::vector<std::vector<double>> &graph, const int source, const int target);
 
 class PRM {
 public:
@@ -27,7 +31,6 @@ public:
 
         float distance = sqrt(pow(end.x - start.x, 2) + pow(end.y - start.y, 2) * 1.0);
         this->distanceMatrix[initialP][finalP] = distance;
-        std::cout << "distance: " << distance << std::endl;
     }
 
     void printNodeGrid() {
@@ -41,4 +44,5 @@ private:
 
     void generateNodeGrid(Image &image, const unsigned int numNodes);
     Image connectNodes(Image image);
+    Image drawRoute(Image image, const std::vector<int> &sequence);
 };

@@ -45,12 +45,6 @@ std::vector<Image::Position> Image::getPathBetweenPoints(const Position& p1, con
             break;
         }
     }
-
-    // if (freeWay) {
-    //     this->drawLine(points);
-    //     float distance = sqrt(pow(end.x - start.x, 2) + pow(end.y - start.y, 2) * 1.0);
-    //     std::cout << "distance: " << distance << std::endl;
-    //     return distance;
-    // }
+    
     return points;
 }

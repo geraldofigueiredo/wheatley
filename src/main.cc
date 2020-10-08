@@ -13,6 +13,5 @@ int main(int argc, char **argv) {
     prm->generateRoute(*imagem, 90, {20, 340}, {340, 30});
     
     image_op::writeImage("./output.png", *imagem);
-    // imagem->printOccupancyGrid();
     return 0;
 }
