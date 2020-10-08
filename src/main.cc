@@ -3,15 +3,14 @@
 #include <route_planner/PRM.h>
 
 int main(int argc, char **argv) {
-    srand(0);
+    // srand(7);
+    srand (time(NULL));
     const auto imagem = image_op::loadImage("../resources/map.png");
     
-    imagem->occupacyGrid();
+    imagem->createOccupancyGrid();
 
     const auto prm = new PRM();
 
-    prm->generateRoute(*imagem, 90, {20, 340}, {340, 30});
-    
-    image_op::writeImage("./output.png", *imagem);
+    prm->generateRoute(*imagem, {20, 340}, {340, 30});
     return 0;
 }

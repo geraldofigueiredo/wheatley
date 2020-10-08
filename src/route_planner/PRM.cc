@@ -1,26 +1,34 @@
 #include "PRM.h"
 
-void PRM::generateRoute(Image &image, const unsigned int numNodes, const Image::Position& start, const Image::Position& end) {
-    distanceMatrix.resize(numNodes+2, std::vector<double>(numNodes+2, 0));
-    image.setStartLocation(start);
-    image.setEndLocation(end);
-    
-    
-    nodeGrid.push_back(start);
-    nodeGrid.push_back(end);
-    generateNodeGrid(image, numNodes);
+void PRM::generateRoute(const Image &image, const Image::Position& start, const Image::Position& end) {
+    unsigned int numNodes = 0;
+    std::vector<int> route;
+    Image imageWithNodes = Image(image);
 
-    image_op::writeImage("./1-nodes.png", image);
+    do {
+        numNodes += 10;
+        std::cout << "numéro de nós utilizados: " << numNodes << std::endl;
 
-    image_op::writeImage("./2-nodesConnection.png", connectNodes(image));
+        Image copyImage = Image(image);
 
-    image_op::writeImage("./3-route.png", drawRoute(image, dijkstra(this->distanceMatrix, 0, 1)));
-    
-    // printNodeGrid();
-    // printDistanceMatrix();
+        copyImage.setStartLocation(start);
+        copyImage.setEndLocation(end);
+        
+        this->resetNodeGrid(start, end);
+        this->resetDistanceMatrix(numNodes);
+        
+        Image imageWithNodes = generateNodeGrid(copyImage, numNodes);
+
+        image_op::writeImage("../resources/1-nodes.png", imageWithNodes);
+        image_op::writeImage("../resources/2-nodesConnection.png", connectNodes(imageWithNodes));
+
+        route = dijkstra(this->distanceMatrix, 0, 1);
+    }while(route.size() == 0 || numNodes == 1000);
+
+    image_op::writeImage("../resources/3-route.png", drawRoute(imageWithNodes, route));
 }
 
-void PRM::generateNodeGrid(Image &image, const unsigned int numNodes) {
+Image PRM::generateNodeGrid(Image image, const unsigned int numNodes) {
     const auto [width, height] = image.getDimension();
     Point::Component x;
     Point::Component y;
@@ -34,6 +42,7 @@ void PRM::generateNodeGrid(Image &image, const unsigned int numNodes) {
         nodeGrid.push_back({x,y});
         image.setPixel({x,y}, Color::BLUE());
     }
+    return image;
 }
 
 Image PRM::connectNodes(Image image) {
@@ -55,6 +64,7 @@ Image PRM::connectNodes(Image image) {
 }
 
 Image PRM::drawRoute(Image image, const std::vector<int> &sequence) {
+    std::cout << "size: " << sequence.size() << std::endl;
     for (size_t i = 0; i < sequence.size()-1; i++) {
         int start = sequence[i];
         int end = sequence[i+1];
@@ -66,7 +76,7 @@ Image PRM::drawRoute(Image image, const std::vector<int> &sequence) {
   
 // A utility function to find the vertex with minimum distance value, from 
 // the set of vertices not yet included in shortest path tree 
-int minDistance(std::vector<int> route, std::vector<bool> sptSet) {
+int minDistance(std::vector<double> route, std::vector<bool> sptSet) {
     // Initialize min value
     double min = __DBL_MAX__;
     int min_index;
@@ -77,20 +87,37 @@ int minDistance(std::vector<int> route, std::vector<bool> sptSet) {
   
     return min_index; 
 } 
-  
-// A utility function to print the constructed distance array 
-void printSolution(const std::vector<int> &route) {
-    printf("Vertex Distance from Source\n"); 
-    for (int i = 0; i < route.size(); i++)
-        printf("%d tt %d\n", i, route[i]); 
+
+void printPath(const std::vector<int> &parent, const int j, std::vector<int> &outputRoute) {
+    // Base Case : If j is source 
+    if (parent[j] == -1)
+        return;
+
+    printPath(parent, parent[j], outputRoute);
+
+    printf("%d ", j);
+    outputRoute.push_back(j);
 } 
+
+// A utility function to print the constructed distance array 
+void printSolution(const std::vector<double> &route, const std::vector<int> &parent, std::vector<int> &outputRoute) {
+    int src = 0; 
+    printf("Vertex\t Distance\tPath"); 
+    for (int i = 1; i < route.size(); i++) 
+    { 
+        printf("\n%d -> %d \t\t %f\t\t%d ", 
+                      src, i, route[i], src);
+        printPath(parent, i, outputRoute);
+    } 
+}
   
 // Function that implements Dijkstra's single source shortest path algorithm 
 // for a graph represented using adjacency matrix representation 
 std::vector<int> dijkstra(const std::vector<std::vector<double>> &graph, const int source, const int target) {
     std::vector<int> sequence;
+    sequence.resize(graph.size());
 
-    std::vector<int> route;
+    std::vector<double> route;
     route.resize(graph.size());
     // int dist[V]; // The output array.  dist[i] will hold the shortest 
     // distance from src to i 
@@ -102,7 +129,7 @@ std::vector<int> dijkstra(const std::vector<std::vector<double>> &graph, const i
   
     // Initialize all distances as INFINITE and stpSet[] as false 
     for (int i = 0; i < route.size(); i++) 
-        route[i] = INT_MAX, sptSet[i] = false;
+        route[i] = __DBL_MAX__, sptSet[i] = false, sequence[i] = -1;
 
     route[source] = 0;
   
@@ -116,10 +143,6 @@ std::vector<int> dijkstra(const std::vector<std::vector<double>> &graph, const i
         // yet processed. u is always equal to src in the first iteration. 
         u = minDistance(route, sptSet);
         sequence.push_back(u);
-        std::cout << "next: " << u << " count: " << count << std::endl;
-        if (u == target) {
-            break;
-        }
   
         // Mark the picked vertex as processed 
         sptSet[u] = true; 
@@ -130,12 +153,18 @@ std::vector<int> dijkstra(const std::vector<std::vector<double>> &graph, const i
             // Update dist[v] only if is not in sptSet, there is an edge from 
             // u to v, and total weight of path from src to  v through u is 
             // smaller than current value of dist[v] 
-            if (!sptSet[v] && graph[u][v] && route[u] != INT_MAX && route[u] + graph[u][v] < route[v]) {
+            if (!sptSet[v] && graph[u][v] && route[u] != __DBL_MAX__ && route[u] + graph[u][v] < route[v]) {
+                sequence[v] = u;
                 route[v] = route[u] + graph[u][v];
             }
-    }while(u != target || count < graph.size());
+    }while(u != target && count < graph.size());
   
-    // print the constructed distance array 
-    // printSolution(route);
-    return sequence;
+    // print the constructed distance array
+    std::vector<int> output;
+    // printSolution(route, sequence, output);
+    printPath(sequence, target, output);
+    if (output.size() > 1) {
+        output.insert(output.begin(), 0);
+    }
+    return output;
 }

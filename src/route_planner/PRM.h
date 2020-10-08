@@ -15,7 +15,7 @@ class PRM {
 public:
     PRM() = default;
     
-    void generateRoute(Image &image, const unsigned int numNodes, const Image::Position& start, const Image::Position& end);
+    void generateRoute(const Image &image, const Image::Position& start, const Image::Position& end);
     void printDistanceMatrix() {
         for (size_t i = 0; i < distanceMatrix.size(); i++) {
             for (size_t j = 0; j < distanceMatrix.size(); j++) {
@@ -33,6 +33,17 @@ public:
         this->distanceMatrix[initialP][finalP] = distance;
     }
 
+    void resetNodeGrid(const Image::Position &start, const Image::Position &end) {
+        nodeGrid.clear();
+        nodeGrid.push_back(start);
+        nodeGrid.push_back(end);
+    }
+
+    void resetDistanceMatrix(const unsigned int numNodes) {
+        distanceMatrix.clear();
+        distanceMatrix.resize(numNodes+2, std::vector<double>(numNodes+2, 0));
+    }
+
     void printNodeGrid() {
         for (size_t i = 0; i < nodeGrid.size(); i++){
             nodeGrid[i].print();
@@ -42,7 +53,7 @@ private:
     std::vector<Point> nodeGrid;
     std::vector<std::vector<double>> distanceMatrix;
 
-    void generateNodeGrid(Image &image, const unsigned int numNodes);
+    Image generateNodeGrid(Image image, const unsigned int numNodes);
     Image connectNodes(Image image);
     Image drawRoute(Image image, const std::vector<int> &sequence);
 };

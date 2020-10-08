@@ -26,6 +26,13 @@ public:
         occupancyGrid.resize(width * height);
     }
 
+    Image(const Image &imageSource):
+    width{imageSource.width},
+    height{imageSource.height},
+    pixels{imageSource.pixels},
+    occupancyGrid{imageSource.occupancyGrid}
+    {}
+
     bool verifyBounds(const Position& position) const {
         return position.x >= 0 && position.y >= 0 && position.x < width && position.y < height;
     }
@@ -48,8 +55,6 @@ public:
         pixels[position.y * width + position.x+1] = color;
     }
 
-    void occupacyGrid() { createOccupancyGrid(); };
-
     bool isOccupied(const Position& position) { return occupancyGrid[position.y * width + position.x] == Occupancy::OCCUPIED; }
     bool isEmpty(const Position& position) { return occupancyGrid[position.y * width + position.x] == Occupancy::EMPTY; }
 
@@ -61,6 +66,19 @@ public:
     void setEndLocation(const Position& end) {
         this->setPixel({end.x, end.y}, Color::GREEN());
         this->occupy(end);
+    }
+
+    void createOccupancyGrid() {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                const auto color = getPixel({x, y});
+                if (color == Color::BLACK() || color == Color::GRAY()) {
+                    this->occupy({x, y});
+                } else if (color == Color::WHITE()) {
+                    this->empty({x, y});
+                }
+            }
+        }
     }
 
     void printOccupancyGrid() {
@@ -98,18 +116,5 @@ private:
 
     void empty(const Position& position) {
         occupancyGrid[position.y * width + position.x] = Occupancy::EMPTY;
-    }
-
-    void createOccupancyGrid() {
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                const auto color = getPixel({x, y});
-                if (color == Color::BLACK() || color == Color::GRAY()) {
-                    this->occupy({x, y});
-                } else if (color == Color::WHITE()) {
-                    this->empty({x, y});
-                }
-            }
-        }
     }
 };
