@@ -1,12 +1,12 @@
 #include "image.h"
 
-void Image::drawLine(std::vector<Position> &points) {
+void Image::drawLine(const std::vector<Position> &points) {
     for (size_t i = 0; i < points.size(); i++) {
         this->setPixel({points[i].x, points[i].y}, Color::LIGHTRED());
     }
 }
 
-float Image::straightLine(const Position& p1, const Position& p2) {
+std::vector<Image::Position> Image::getPathBetweenPoints(const Position& p1, const Position& p2) {
     auto start = p1;
     auto end = p2;
     // DDA algorithm
@@ -34,7 +34,6 @@ float Image::straightLine(const Position& p1, const Position& p2) {
     x = start.x;
     y = start.y;
 
-    bool freeWay = true;
     std::vector<Position> points;
     while (x < end.x) {
         x += xInc;
@@ -42,17 +41,16 @@ float Image::straightLine(const Position& p1, const Position& p2) {
         points.push_back({round(x), round(y)});
 
         if (this->isOccupied({round(x), round(y)})) {
-            freeWay = false;
+            points.clear();
             break;
         }
     }
 
-    if (freeWay) {
-        this->drawLine(points);
-        float distance = sqrt(pow(end.x - start.x, 2) + pow(end.y - start.y, 2) * 1.0);
-        std::cout << "distance: " << distance << std::endl;
-        return distance;
-    }
-
-    return 0;
+    // if (freeWay) {
+    //     this->drawLine(points);
+    //     float distance = sqrt(pow(end.x - start.x, 2) + pow(end.y - start.y, 2) * 1.0);
+    //     std::cout << "distance: " << distance << std::endl;
+    //     return distance;
+    // }
+    return points;
 }

@@ -1,7 +1,7 @@
 #include "PRM.h"
 
 void PRM::generateRoute(Image &image, const unsigned int numNodes, const Image::Position& start, const Image::Position& end) {
-    distanceMatrix.resize(numNodes, std::vector<double>(numNodes, 0));
+    distanceMatrix.resize(numNodes+2, std::vector<double>(numNodes+2, 0));
     image.setStartLocation(start);
     image.setEndLocation(end);
     
@@ -9,7 +9,10 @@ void PRM::generateRoute(Image &image, const unsigned int numNodes, const Image::
     nodeGrid.push_back(end);
     
     generateNodeGrid(image, numNodes);
-    connectNodes(image);
+    image_op::writeImage("./1-nodes.png", image);
+
+    image_op::writeImage("./2-nodesConnection.png", connectNodes(image));
+    
     printNodeGrid();
     printDistanceMatrix();
 
@@ -31,16 +34,20 @@ void PRM::generateNodeGrid(Image &image, const unsigned int numNodes) {
     }
 }
 
-void PRM::connectNodes(Image &image) {
+Image PRM::connectNodes(Image image) {
     for (size_t i = 0; i < nodeGrid.size(); i++) {
         for (size_t j = 0; j < nodeGrid.size(); j++) {
             if (i == j) {
                 this->distanceMatrix[i][j] = 0;
                 continue;
             }
-            
-            float distance = image.straightLine(nodeGrid[i], nodeGrid[j]);
-            this->distanceMatrix[i][j] = distance;
+            std::vector<Image::Position> points = image.getPathBetweenPoints(nodeGrid[i], nodeGrid[j]);
+            image.drawLine(points);
+
+            if (points.size() > 0) {
+                setDistanceBetweenPoints(i, j);
+            }
         }
     }
+    return image;
 }

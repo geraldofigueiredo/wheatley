@@ -40,12 +40,18 @@ public:
         pixels[position.y * width + position.x] = color;
     }
 
+    void setNode(const Position& position, const Color& color) {
+        assertInBound(position);
+        pixels[position.y-1 * width + position.x] = color;
+        pixels[position.y-1 * width + position.x+1] = color;
+        pixels[position.y * width + position.x] = color;
+        pixels[position.y * width + position.x+1] = color;
+    }
+
     void occupacyGrid() { createOccupancyGrid(); };
 
     bool isOccupied(const Position& position) { return occupancyGrid[position.y * width + position.x] == Occupancy::OCCUPIED; }
     bool isEmpty(const Position& position) { return occupancyGrid[position.y * width + position.x] == Occupancy::EMPTY; }
-
-    float straightLine(const Position& p1, const Position& p2);
 
     void setStartLocation(const Position& start) {
         this->setPixel({start.x, start.y}, Color::RED());
@@ -70,6 +76,9 @@ public:
     Dimension getDimension() const { return std::make_pair(width, height); }
     unsigned int getWidth() const { return width; }
     unsigned int getHeight() const { return height; }
+
+    std::vector<Position> getPathBetweenPoints(const Position& p1, const Position& p2);
+    void drawLine(const std::vector<Position> &points);
 
 private:
     std::vector<Color> pixels;
@@ -103,6 +112,4 @@ private:
             }
         }
     }
-
-    void drawLine(std::vector<Position> &points);
 };
