@@ -7,7 +7,7 @@ void PRM::generateRoute(const Image &image, const Image::Position& start, const 
 
     do {
         numNodes += 10;
-        std::cout << "numéro de nós utilizados: " << numNodes << std::endl;
+        std::cout << "número de nós utilizados: " << numNodes << " - ";
 
         Image copyImage = Image(image);
 
@@ -17,12 +17,12 @@ void PRM::generateRoute(const Image &image, const Image::Position& start, const 
         this->resetNodeGrid(start, end);
         this->resetDistanceMatrix(numNodes);
         
-        Image imageWithNodes = generateNodeGrid(copyImage, numNodes);
+        auto imageWithNodes = generateNodeGrid(copyImage, numNodes);
 
         image_op::writeImage("../resources/1-nodes.png", imageWithNodes);
         image_op::writeImage("../resources/2-nodesConnection.png", connectNodes(imageWithNodes));
 
-        route = dijkstra(this->distanceMatrix, 0, 1);
+        route = shortestPathAlgo->findShortestPath(this->distanceMatrix, 0, 1);
     }while(route.size() == 0 || numNodes == 1000);
 
     image_op::writeImage("../resources/3-route.png", drawRoute(imageWithNodes, route));
@@ -64,7 +64,6 @@ Image PRM::connectNodes(Image image) {
 }
 
 Image PRM::drawRoute(Image image, const std::vector<int> &sequence) {
-    std::cout << "size: " << sequence.size() << std::endl;
     for (size_t i = 0; i < sequence.size()-1; i++) {
         int start = sequence[i];
         int end = sequence[i+1];

@@ -8,12 +8,13 @@
 #include "../image/image.h"
 #include "../image/color.h"
 #include "../image/image_op.h"
+#include "../algorithm/algorithm.h"
 
 std::vector<int> dijkstra(const std::vector<std::vector<double>> &graph, const int source, const int target);
 
 class PRM {
 public:
-    PRM() = default;
+    PRM(Algorithm *shortestPathAlgo):shortestPathAlgo{shortestPathAlgo}{};
     
     void generateRoute(const Image &image, const Image::Position& start, const Image::Position& end);
     void printDistanceMatrix() {
@@ -52,6 +53,7 @@ public:
 private:
     std::vector<Point> nodeGrid;
     std::vector<std::vector<double>> distanceMatrix;
+    Algorithm *shortestPathAlgo;
 
     Image generateNodeGrid(Image image, const unsigned int numNodes);
     Image connectNodes(Image image);
